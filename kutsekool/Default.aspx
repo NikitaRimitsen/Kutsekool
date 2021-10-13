@@ -3,64 +3,90 @@
 <asp:Content ID="BodyContent" ContentPlaceHolderID="MainContent" runat="server">
 
 
-        <h1>Noorem Tarkvaraarendaja õppeained</h1>
-   
-
-    
-        <div class="col-md-4">
-           
-            <asp:GridView ID="GridView1" runat="server" AutoGenerateColumns="False" BackColor="#CCCCCC" BorderColor="#999999" BorderStyle="Solid" BorderWidth="3px" CellPadding="4" CellSpacing="2" DataKeyNames="ainedId" DataSourceID="SqlDataSource1" EmptyDataText="There are no data records to display." ForeColor="Black" Width="429px">
+        <h1>Noorem Tarkvaraarendaja õppeaine koos õpetajaga</h1>
+        <p>
+            <asp:GridView ID="GridView1" runat="server" AutoGenerateColumns="False" DataKeyNames="ainedId" DataSourceID="SqlDataSource1" EmptyDataText="There are no data records to display." Width="521px">
                 <Columns>
                     <asp:CommandField ShowDeleteButton="True" ShowEditButton="True" />
+                    <asp:BoundField DataField="ainedId" HeaderText="ainedId" InsertVisible="False" ReadOnly="True" SortExpression="ainedId" />
                     <asp:BoundField DataField="aineNimetus" HeaderText="aineNimetus" SortExpression="aineNimetus" />
                     <asp:BoundField DataField="kirjeldus" HeaderText="kirjeldus" SortExpression="kirjeldus" />
-                    <asp:BoundField DataField="ainedId" HeaderText="ainedId" InsertVisible="False" ReadOnly="True" SortExpression="ainedId" />
+                    <asp:BoundField DataField="perenimi" HeaderText="perenimi" SortExpression="perenimi" />
                 </Columns>
-                <FooterStyle BackColor="#CCCCCC" />
-                <HeaderStyle BackColor="Black" Font-Bold="True" ForeColor="White" />
-                <PagerStyle BackColor="#CCCCCC" ForeColor="Black" HorizontalAlign="Left" />
-                <RowStyle BackColor="White" />
-                <SelectedRowStyle BackColor="#000099" Font-Bold="True" ForeColor="White" />
-                <SortedAscendingCellStyle BackColor="#F1F1F1" />
-                <SortedAscendingHeaderStyle BackColor="#808080" />
-                <SortedDescendingCellStyle BackColor="#CAC9C9" />
-                <SortedDescendingHeaderStyle BackColor="#383838" />
             </asp:GridView>
-            <asp:SqlDataSource ID="SqlDataSource1" runat="server" ConnectionString="<%$ ConnectionStrings:kutsekoolRimitsenConnectionString1 %>" DeleteCommand="DELETE FROM [oppeaine] WHERE [ainedId] = @ainedId" InsertCommand="INSERT INTO [oppeaine] ([aineNimetus], [kirjeldus]) VALUES (@aineNimetus, @kirjeldus)" SelectCommand="SELECT [aineNimetus], [kirjeldus], [ainedId] FROM [oppeaine]" UpdateCommand="UPDATE [oppeaine] SET [aineNimetus] = @aineNimetus, [kirjeldus] = @kirjeldus WHERE [ainedId] = @ainedId">
+            <asp:SqlDataSource ID="SqlDataSource1" runat="server" ConnectionString="<%$ ConnectionStrings:kutsekoolRimitsenConnectionString1 %>" DeleteCommand="DELETE FROM [oppeaine] WHERE [ainedId] = @ainedId" InsertCommand="INSERT INTO [oppeaine] ([aineNimetus], [kirjeldus], [opetajaId]) VALUES (@aineNimetus, @kirjeldus, @opetajaId)" SelectCommand="SELECT oppeaine.ainedId, oppeaine.aineNimetus, oppeaine.kirjeldus, opetaja.perenimi FROM oppeaine INNER JOIN opetaja ON oppeaine.opetajaId = opetaja.opetajaId" UpdateCommand="UPDATE [oppeaine] SET [aineNimetus] = @aineNimetus, [kirjeldus] = @kirjeldus, [opetajaId] = @opetajaId WHERE [ainedId] = @ainedId">
                 <DeleteParameters>
                     <asp:Parameter Name="ainedId" Type="Int32" />
                 </DeleteParameters>
                 <InsertParameters>
                     <asp:Parameter Name="aineNimetus" Type="String" />
                     <asp:Parameter Name="kirjeldus" Type="String" />
+                    <asp:Parameter Name="opetajaId" Type="Int32" />
                 </InsertParameters>
                 <UpdateParameters>
                     <asp:Parameter Name="aineNimetus" Type="String" />
                     <asp:Parameter Name="kirjeldus" Type="String" />
+                    <asp:Parameter Name="opetajaId" Type="Int32" />
                     <asp:Parameter Name="ainedId" Type="Int32" />
                 </UpdateParameters>
             </asp:SqlDataSource>
+        </p>
+   
+
+    
+        <div class="col-md-4">
+           
             <h2>Uue õppaine lisamine</h2>
             <h3>
-                <asp:DetailsView ID="DetailsView1" runat="server" AutoGenerateRows="False" CellPadding="4" DataKeyNames="ainedId" DataSourceID="SqlDataSource1" DefaultMode="Insert" ForeColor="#333333" GridLines="None" Height="50px" Width="137px">
-                    <AlternatingRowStyle BackColor="White" />
-                    <CommandRowStyle BackColor="#C5BBAF" Font-Bold="True" />
-                    <EditRowStyle BackColor="#7C6F57" />
-                    <FieldHeaderStyle BackColor="#D0D0D0" Font-Bold="True" />
+                <asp:DetailsView ID="DetailsView1" runat="server" AutoGenerateRows="False" DataKeyNames="ainedId" DataSourceID="SqlDataSource_aine" DefaultMode="Insert" Height="50px" Width="125px">
                     <Fields>
+                        <asp:BoundField DataField="ainedId" HeaderText="ainedId" InsertVisible="False" ReadOnly="True" SortExpression="ainedId" />
                         <asp:BoundField DataField="aineNimetus" HeaderText="aineNimetus" SortExpression="aineNimetus" />
                         <asp:BoundField DataField="kirjeldus" HeaderText="kirjeldus" SortExpression="kirjeldus" />
-                        <asp:BoundField DataField="ainedId" HeaderText="ainedId" InsertVisible="False" ReadOnly="True" SortExpression="ainedId" Visible="False" />
+                        <asp:TemplateField HeaderText="opetajaId" SortExpression="opetajaId">
+                            <EditItemTemplate>
+                                <asp:TextBox ID="TextBox1" runat="server" Text='<%# Bind("opetajaId") %>'></asp:TextBox>
+                            </EditItemTemplate>
+                            <InsertItemTemplate>
+                                <asp:DropDownList ID="DropDownList1" runat="server" DataSourceID="SqlDataSource_opetaja" DataTextField="perenimi" DataValueField="opetajaId" SelectedValue='<%# Bind("opetajaId") %>'>
+                                </asp:DropDownList>
+                                <asp:SqlDataSource ID="SqlDataSource_opetaja" runat="server" ConnectionString="<%$ ConnectionStrings:kutsekoolRimitsenConnectionString1 %>" DeleteCommand="DELETE FROM [opetaja] WHERE [opetajaId] = @opetajaId" InsertCommand="INSERT INTO [opetaja] ([perenimi]) VALUES (@perenimi)" SelectCommand="SELECT [opetajaId], [perenimi] FROM [opetaja]" UpdateCommand="UPDATE [opetaja] SET [perenimi] = @perenimi WHERE [opetajaId] = @opetajaId">
+                                    <DeleteParameters>
+                                        <asp:Parameter Name="opetajaId" Type="Int32" />
+                                    </DeleteParameters>
+                                    <InsertParameters>
+                                        <asp:Parameter Name="perenimi" Type="String" />
+                                    </InsertParameters>
+                                    <UpdateParameters>
+                                        <asp:Parameter Name="perenimi" Type="String" />
+                                        <asp:Parameter Name="opetajaId" Type="Int32" />
+                                    </UpdateParameters>
+                                </asp:SqlDataSource>
+                            </InsertItemTemplate>
+                            <ItemTemplate>
+                                <asp:Label ID="Label1" runat="server" Text='<%# Bind("opetajaId") %>'></asp:Label>
+                            </ItemTemplate>
+                        </asp:TemplateField>
                         <asp:CommandField ShowInsertButton="True" />
                     </Fields>
-                    <FooterStyle BackColor="#1C5E55" Font-Bold="True" ForeColor="White" />
-                    <HeaderStyle BackColor="#1C5E55" Font-Bold="True" ForeColor="White" />
-                    <PagerStyle BackColor="#666666" ForeColor="White" HorizontalAlign="Center" />
-                    <RowStyle BackColor="#E3EAEB" />
                 </asp:DetailsView>
+                <asp:SqlDataSource ID="SqlDataSource_aine" runat="server" ConnectionString="<%$ ConnectionStrings:kutsekoolRimitsenConnectionString1 %>" DeleteCommand="DELETE FROM [oppeaine] WHERE [ainedId] = @ainedId" InsertCommand="INSERT INTO [oppeaine] ([aineNimetus], [kirjeldus], [opetajaId]) VALUES (@aineNimetus, @kirjeldus, @opetajaId)" SelectCommand="SELECT * FROM [oppeaine]" UpdateCommand="UPDATE [oppeaine] SET [aineNimetus] = @aineNimetus, [kirjeldus] = @kirjeldus, [opetajaId] = @opetajaId WHERE [ainedId] = @ainedId">
+                    <DeleteParameters>
+                        <asp:Parameter Name="ainedId" Type="Int32" />
+                    </DeleteParameters>
+                    <InsertParameters>
+                        <asp:Parameter Name="aineNimetus" Type="String" />
+                        <asp:Parameter Name="kirjeldus" Type="String" />
+                        <asp:Parameter Name="opetajaId" Type="Int32" />
+                    </InsertParameters>
+                    <UpdateParameters>
+                        <asp:Parameter Name="aineNimetus" Type="String" />
+                        <asp:Parameter Name="kirjeldus" Type="String" />
+                        <asp:Parameter Name="opetajaId" Type="Int32" />
+                        <asp:Parameter Name="ainedId" Type="Int32" />
+                    </UpdateParameters>
+                </asp:SqlDataSource>
             </h3>
-            <p>
-                &nbsp;</p>
            
         </div>
         <div class="col-md-4">
